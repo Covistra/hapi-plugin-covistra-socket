@@ -1,6 +1,6 @@
 {
   "name": "covistra-socket",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "dependencies": {
     "lodash": "^3.10.1",
     "socket.io": "^1.3.6"

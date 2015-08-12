@@ -24,40 +24,17 @@ exports.register = function (server, options, next) {
 
     var io = SocketIO.listen(server.listener);
 
-    io.sockets.on('connection', function(socket) {
+    var log = server.plugins['covistra-system'].systemLog;
+    var config = server.plugins['hapi-config'].CurrentConfiguration;
+
+    var socketManager = require('./lib/socket-manager')(server, io, log.child({service: 'socket-manager'}), config);
+
+    io.on('connection', function(socket) {
         server.log(['plugin', 'socket', 'debug'], "Client is connected on our socket");
-
-        socket.on('open-channels', function(channels) {
-            _.each(channels, function(channel) {
-                server.log(['plugin', 'socket', 'trace'], "Joining channel:"+channel);
-                socket.join(channel);
-            });
-        });
+        socketManager.clientConnected(socket);
     });
 
-    server.expose('sendTo', function(username, key, payload) {
-        server.log(['plugin', 'socket', 'debug'], "Send message to all open devices for user "+username);
-        io.sockets.to(username).emit(key, payload);
-    });
-
-    server.expose('broadcast', function(channel, key, payload) {
-        if(arguments.length == 2) {
-            payload = key;
-            key = channel;
-            channel = undefined;
-        }
-
-        server.log(['plugin', 'socket', 'trace'], "Broadcasting message "+key);
-
-        if(channel) {
-            server.log(['plugin', 'socket', 'debug'], "Broadcasting to channel:"+channel);
-            io.sockets.to(channel).emit(key, payload);
-        }
-        else {
-            server.log(['plugin', 'socket', 'debug'], "Broadcasting to all connected devices");
-            io.sockets.emit(key, payload);
-        }
-    });
+    server.expose('socketManager', socketManager);
 
     next();
 };

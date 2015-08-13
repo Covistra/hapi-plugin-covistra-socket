@@ -20,12 +20,15 @@ var SocketIO = require('socket.io'),
 "use strict";
 
 exports.register = function (server, options, next) {
-    server.log(['plugin', 'info'], "Registering the Socket plugin");
-
-    var io = SocketIO.listen(server.listener);
 
     var log = server.plugins['covistra-system'].systemLog;
     var config = server.plugins['hapi-config'].CurrentConfiguration;
+
+    log.info("Registering the socket plugin", server.select('api').listener);
+
+    var io = SocketIO(server.select('api').listener);
+
+    log.debug("Socket.IO instance has been successfully created");
 
     var socketManager = require('./lib/socket-manager')(server, io, log.child({service: 'socket-manager'}), config);
 

@@ -15,6 +15,7 @@
  limitations under the License.
  */
 var SocketIO = require('socket.io'),
+    redis = require('redis'),
     _ = require('lodash');
 
 "use strict";
@@ -27,6 +28,17 @@ exports.register = function (server, options, next) {
     log.info("Registering the socket plugin", server.select('api').listener);
 
     var io = SocketIO(server.select('api').listener);
+
+    if(config.get("plugins:covistra-socket:redis_session")) {
+        // Setting up Redis session management using global redis server
+        var socketIORedis = require('socket.io-redis');
+        var redisHost = config.get("REDIS_URL");
+        var redisPort = config.get("REDIS_PORT");
+        var redisPassword = config.get("REDIS_PASSWORD");
+        var pub = redis.createClient(redisPort, redisHost, {auth_pass: redisPassword});
+        var sub = redis.createClient(redisPort, redisHost, {detect_buffers: true, auth_pass: redisPasswod } );
+        io.adapter(socketIORedis({pubClient: pub, subClient: sub}));
+    }
 
     log.debug("Socket.IO instance has been successfully created");
 

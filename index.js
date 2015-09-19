@@ -27,7 +27,9 @@ exports.register = function (server, options, next) {
 
     log.info("Registering the socket plugin", server.select('api').listener);
 
-    var io = SocketIO(server.select('api').listener);
+    // Check for new api + admin connections and fallback to server directly
+    var conn = server.select('api') || server;
+    var io = SocketIO(conn.listener);
 
     if(config.get("plugins:covistra-socket:redis_session")) {
         // Setting up Redis session management using global redis server

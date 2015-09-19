@@ -38,7 +38,7 @@ exports.register = function (server, options, next) {
         var redisPort = config.get("REDIS_PORT");
         var redisPassword = config.get("REDIS_PASSWORD");
         var pub = redis.createClient(redisPort, redisHost, {auth_pass: redisPassword});
-        var sub = redis.createClient(redisPort, redisHost, {detect_buffers: true, auth_pass: redisPasswod } );
+        var sub = redis.createClient(redisPort, redisHost, {detect_buffers: true, auth_pass: redisPassword } );
         io.adapter(socketIORedis({pubClient: pub, subClient: sub}));
     }
 

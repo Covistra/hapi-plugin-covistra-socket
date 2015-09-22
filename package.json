@@ -1,6 +1,6 @@
 {
   "name": "covistra-socket",
-  "version": "0.4.3-pre",
+  "version": "0.4.3",
   "dependencies": {
     "eventemitter2": "^0.4.14",
     "lodash": "^3.10.1",

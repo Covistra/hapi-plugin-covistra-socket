@@ -20,12 +20,14 @@ var SocketIO = require('socket.io'),
 
 "use strict";
 
+exports.deps = ['covistra-system'];
+
 exports.register = function (server, options, next) {
 
     var log = server.plugins['covistra-system'].systemLog;
     var config = server.plugins['hapi-config'].CurrentConfiguration;
 
-    log.info("Registering the socket plugin", server.select('api').listener);
+    log.info("Registering the socket plugin on API connection");
 
     // Check for new api + admin connections and fallback to server directly
     var conn = server.select('api') || server;

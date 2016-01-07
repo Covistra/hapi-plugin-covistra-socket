@@ -46,10 +46,10 @@ exports.register = function (server, options, next) {
 
     log.debug("Socket.IO instance has been successfully created");
 
-    var socketManager = require('./lib/socket-manager')(server, io, log.child({service: 'socket-manager'}), config);
+    var socketManager = require('./lib/socket-manager')(server, io, log.child({service: 'socket-manager', level: config.get('plugins:socket:log_level')}), config);
 
     io.on('connection', function(socket) {
-        server.log(['plugin', 'socket', 'debug'], "Client is connected on our socket");
+        log.debug("Client is connected on socket %s", socket.id);
         socketManager.clientConnected(socket);
     });
 

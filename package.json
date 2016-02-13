@@ -1,6 +1,6 @@
 {
   "name": "covistra-socket",
-  "version": "0.5.1",
+  "version": "0.5.2-pre",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",

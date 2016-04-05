@@ -1,7 +1,4 @@
-var Joi = require('joi'),
-    _ = require('lodash'),
-    Boom = require('boom'),
-    P = require('bluebird');
+var Boom = require('boom');
 
 module.exports = function(server, config, log) {
     "use strict";
@@ -10,10 +7,10 @@ module.exports = function(server, config, log) {
 
     function service(msg) {
         var id = _.get(msg, "data.id") || _.get(msg, "socket$.context.client.id");
-        log.debug("Assigning client %s to group(s)", id, msg.data.groups);
+        log.debug("Removing client %s from group(s)", id, msg.data.groups);
         var client = socketManager.getClientForId(id);
         if(client) {
-            return client.join(msg.data.groups);
+            return client.leave(msg.data.groups);
         }
         else {
             log.error("Client %s wasn't registered", id);
@@ -22,8 +19,8 @@ module.exports = function(server, config, log) {
     }
 
     return {
-        pattern: { cmp: 'socket', tar: 'client', act: 'add-to-group'},
-        event: 'add-client-to-group',
+        pattern: { cmp: 'socket', tar: 'client', act: 'remove-from-group'},
+        event: 'remove-from-group',
         callback: service
     }
 };

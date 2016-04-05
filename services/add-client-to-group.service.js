@@ -9,18 +9,17 @@ module.exports = function(server, config, log) {
     var socketManager = server.plugins['covistra-socket'].socketManager;
 
     function service(msg) {
-        msg.id = msg.id || _.get(msg, "socket$.id");
-
-        log.debug("Assigning client %s to group(s)", msg.id, msg.groups);
-        var client = socketManager.getClientForId(msg.id);
+        var id = _.get(msg, "data.id") || _.get(msg, "socket$.context.client.id");
+        log.debug("Assigning client %s to group(s)", id, msg.data.groups);
+        var client = socketManager.getClientForId(id);
         if(client) {
-            client.groups = client.groups.concat(msg.groups);
+            client.groups = client.groups.concat(msg.data.groups);
             return {
                 success: true
             }
         }
         else {
-            log.error("Client %s wasn't registered", msg.id);
+            log.error("Client %s wasn't registered", id);
             throw Boom.notFound();
         }
     }
@@ -28,10 +27,6 @@ module.exports = function(server, config, log) {
     return {
         pattern: { cmp: 'socket', tar: 'client', act: 'add-to-group'},
         event: 'add-client-to-group',
-        schema: Joi.object().keys({
-            id: Joi.string(),
-            groups: Joi.array()
-        }),
         callback: service
     }
 };

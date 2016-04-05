@@ -26,6 +26,7 @@ exports.register = function (server, options, next) {
 
     var log = server.plugins['covistra-system'].systemLog;
     var config = server.plugins['hapi-config'].CurrentConfiguration;
+    var Services = server.plugins['covistra-system'].Services;
 
     log.info("Registering the socket plugin on API connection");
 
@@ -34,6 +35,8 @@ exports.register = function (server, options, next) {
     var io = SocketIO(conn.listener);
 
     if(config.get("plugins:covistra-socket:redis_session")) {
+        log.info("Using Redis Session store for shared cluster socket infos");
+
         // Setting up Redis session management using global redis server
         var socketIORedis = require('socket.io-redis');
         var redisHost = config.get("REDIS_URL");
@@ -54,6 +57,8 @@ exports.register = function (server, options, next) {
     });
 
     server.expose('socketManager', socketManager);
+
+    Services.discover(__dirname, 'services');
 
     next();
 };
